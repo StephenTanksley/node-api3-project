@@ -1,15 +1,31 @@
 const express = require('express');
 const users = require('./userDb')
 const postRouter = require('../posts/postRouter')
+const { 
+  validatePost, 
+  validateUserId,  
+  validateUser } = require('../middleware/validate')
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
-  // do your magic!
+router.post('/', validatePost(), validateUserId(), async (req, res, next) => {
+  try {
+    users.insert(req.body)
+  }
+  catch (error) {
+    next(error)
+  }
 });
 
-router.post('/:id/posts', async (req, res) => {
-  // do your magic!
+router.post('/:id/posts', validatePost(), (req, res, next) => {
+  users.insert(req.body)
+  .then(user => {
+    res
+      .status(201)
+      .json(user)
+  })
+  .catch(error => 
+    next(error))
 });
 
 router.get('/', (req, res, next) => {
@@ -24,68 +40,63 @@ router.get('/', (req, res, next) => {
     })
 });
 
-router.get('/:id', validateUserId(), async (req, res) => {
-  // do your magic!
+router.get('/:id', validateUserId(), async (req, res, next) => {
+  try {
+    const payload = await users.getById(req.params.id)
+    res
+      .status(200)
+      .json(payload)
+    } 
+  catch (error) {
+    next(error)
+    }
 });
 
-router.get('/:id/posts', async (req, res) => {
-  // do your magic!
-});
-
-router.delete('/:id', async (req, res) => {
-  // do your magic!
-});
-
-router.put('/:id', async (req, res) => {
-  // do your magic!
-});
-
-//custom middleware
-
-function validateUserId(req, res, next) {
-  return (req, res, next) => {
-    users.findById(req.params.id)
-      .then(user => {
-        if (user) {
-          req.user = user
-          console.log("User id is valid.")
-          next()
-        } else {
-          res
-            .status(400)
-            .json({ message: "Invalid user id." })
-        }
+router.get('/:id/posts', validateUserId(), async (req, res, next) => {
+  try {
+    const posts = await users.getUserPosts(req.params.id)
+    .then(posts => {
+      res
+        .status(200)
+        .json(posts)
       })
-  }
-}
+    }
+  catch (error) {
+    next(error)
+    }
+});
 
-// Checks the res.body to see if there's content there.
-// If there isn't, there's an error. 
-function validateUser(req, res, next) {
-  return (req, res, next) => {
-    if(!req.body) {
-      return res
-              .status(400)
-              .json({ message: "Missing user data"})
-    }
-    next()
+router.delete('/:id', validateUserId(), (req, res, next) => {
+  try {
+    users.remove(req.params.id)
+    .then(user => {
+      if(user > 0) {
+        res
+          .status(204)
+          .json({ message: "The user has been deleted."})
+      }
+    })
   }
-}
+  catch (error) {
+    next(error)
+  }
+});
 
-function validatePost(req, res, next) {
-  return (req, res, next) => {
-    if(!req.body) {
-      return res
-              .status(400)
-              .json({ message: "Missing post data"})
-    }
-    if(!req.body.text) {
-      return res
-              .status(400)
-              .json({ message: "Missing required text field." })
-    }
-    next()
+router.put('/:id', validateUserId(), validateUser(), (req, res, next) => {
+  try {
+    users.update(req.params.id, req.params.body)
+    .then(user => {
+      res
+        .status(200)
+        .json(user)
+    })
   }
-}
+  catch (error) {
+    next(error)
+  }
+
+});
+
+
 
 module.exports = router;
