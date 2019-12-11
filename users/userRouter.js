@@ -1,4 +1,6 @@
 const express = require('express');
+const user = require('./userDb')
+const postRouter = require('../posts/postRouter')
 
 const router = express.Router();
 
@@ -33,11 +35,23 @@ router.put('/:id', (req, res) => {
 //custom middleware
 
 function validateUserId(req, res, next) {
-  // do your magic!
+  return (req, res, next) => {
+    user.findById(req.params.id)
+      .then(item => {
+        if (item) {
+          req.user = item
+          next()
+        } else {
+          res.status(404).json({ message: "Resource not found." })
+        }
+      })
+  }
 }
 
 function validateUser(req, res, next) {
-  // do your magic!
+  return (req, res, next) => {
+
+  }
 }
 
 function validatePost(req, res, next) {
