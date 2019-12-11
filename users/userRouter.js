@@ -73,7 +73,19 @@ function validateUser(req, res, next) {
 }
 
 function validatePost(req, res, next) {
-  // do your magic!
+  return (req, res, next) => {
+    if(!req.body) {
+      return res
+              .status(400)
+              .json({ message: "Missing post data"})
+    }
+    if(!req.body.text) {
+      return res
+              .status(400)
+              .json({ message: "Missing required text field." })
+    }
+    next()
+  }
 }
 
 module.exports = router;
