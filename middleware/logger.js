@@ -1,7 +1,9 @@
 module.exports = (type) => (req, res, next) => {
+    let time = new Date();
+    let utcTime = time.toUTCString();
 
     if(type === 'long') {
-        console.log(`long request: ${req.ip} -- ${req.protocol} -- ${req.method} -- ${req.url} -- ${req.get("User-Agent")} `)
+        console.log(`long request: ${req.method} -- ${req.url} -- ${req.url} -- ${utcTime} `)
         next()
 
     } else if (type === 'short') {
