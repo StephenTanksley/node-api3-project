@@ -44,13 +44,16 @@ router.put('/:id', async (req, res) => {
 
 function validateUserId(req, res, next) {
   return (req, res, next) => {
-    user.findById(req.params.id)
+    users.findById(req.params.id)
       .then(item => {
         if (item) {
           req.user = item
+          console.log("User id is valid.")
           next()
         } else {
-          res.status(404).json({ message: "Resource not found." })
+          res
+            .status(400)
+            .json({ message: "Invalid user id." })
         }
       })
   }
