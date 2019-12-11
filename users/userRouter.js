@@ -45,9 +45,9 @@ router.put('/:id', async (req, res) => {
 function validateUserId(req, res, next) {
   return (req, res, next) => {
     users.findById(req.params.id)
-      .then(item => {
-        if (item) {
-          req.user = item
+      .then(user => {
+        if (user) {
+          req.user = user
           console.log("User id is valid.")
           next()
         } else {
@@ -59,9 +59,16 @@ function validateUserId(req, res, next) {
   }
 }
 
+// Checks the res.body to see if there's content there.
+// If there isn't, there's an error. 
 function validateUser(req, res, next) {
   return (req, res, next) => {
-
+    if(!req.body) {
+      return res
+              .status(400)
+              .json({ message: "Missing user data"})
+    }
+    next()
   }
 }
 
