@@ -30,7 +30,7 @@ router.post('/', validateUser(), async (req, res, next) => {
 });
 
 //adding a new post attached to a user
-router.post('/:id/posts', validatePost(), async (req, res, next) => {
+router.post('/:id/posts', validatePost(), validateUserId(), async (req, res, next) => {
   try{
     const userPost = {
       text: req.body.text,
