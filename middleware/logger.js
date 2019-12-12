@@ -12,6 +12,6 @@ module.exports = (type) => (req, res, next) => {
 
     } else {
         console.log(req)
-        
+        return
     }     
 }

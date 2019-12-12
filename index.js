@@ -5,15 +5,15 @@ const logger = require('./middleware/logger')
 // const validate = require('./middleware/validate')
 
 const userRouter = require('./users/userRouter')
+const postRouter = require('./posts/postRouter')
  
 server.use(logger('long')) 
 server.use(express.json())
-server.use("/", (req, res) => {
-    res
-    .json({ message: "Welcome to the Node API3 project!"})
-})
 
 server.use("/api/users", userRouter)
+// server.use("/api/:id/posts", postRouter)
+//pretty sure I should be adding my postRouter to my userRouter route since we'd need to chain posts off of users.
+
 
 server.use((req, res) => {
     res
